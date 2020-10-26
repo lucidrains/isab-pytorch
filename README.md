@@ -1,3 +1,5 @@
+<img src="./isab.png"></img>
+
 ## Induced Set Attention Block (ISAB) - Pytorch
 
 A concise implementation of (Induced) Set Attention Block, from the Set Transformers paper.
