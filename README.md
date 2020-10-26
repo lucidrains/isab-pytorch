@@ -16,7 +16,7 @@ You can either set the number of induced points, in which the parameters will be
 
 ```python
 import torch
-from isab_pytorch.isab_pytorch import ISAB
+from isab_pytorch import ISAB
 
 attn = ISAB(
     dim = 512,
@@ -33,7 +33,7 @@ Or you can not set the number of induced points, where you can pass in the induc
 ```python
 import torch
 from torch import nn
-from isab_pytorch.isab_pytorch import ISAB
+from isab_pytorch import ISAB
 
 attn = ISAB(
     dim = 512,
