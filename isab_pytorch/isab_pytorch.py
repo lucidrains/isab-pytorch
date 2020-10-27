@@ -54,7 +54,9 @@ class ISAB(nn.Module):
         b, *_ = x.shape
         assert exists(queries) ^ exists(self.induced_points), 'you can only either learn the induced points within the module, or pass it in externally'
         queries = queries if exists(queries) else self.induced_points
-        queries = repeat(queries, 'n d -> b n d', b = b)
+
+        if queries.ndim == 2:
+            queries = repeat(queries, 'n d -> b n d', b = b)
 
         induced = self.attn1(queries, x, mask = mask)
         out     = self.attn2(x, induced)
