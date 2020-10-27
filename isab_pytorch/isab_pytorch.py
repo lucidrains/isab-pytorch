@@ -18,6 +18,7 @@ class Attention(nn.Module):
         self.scale = (dim // heads) ** -0.5
         self.to_q = nn.Linear(dim, dim, bias = False)
         self.to_kv = nn.Linear(dim, dim * 2, bias = False)
+        self.to_out = nn.Linear(dim, dim)
 
     def forward(self, x, context, mask = None):
         h, scale = self.heads, self.scale
@@ -36,7 +37,7 @@ class Attention(nn.Module):
         out = einsum('b h i j, b h j d -> b h i d', attn, v)
 
         out = rearrange(out, 'b h n d -> b n (h d)', h = h)
-        return out
+        return self.to_out(out)
 
 class ISAB(nn.Module):
     def __init__(
