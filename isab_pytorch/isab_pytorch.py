@@ -19,18 +19,23 @@ class Attention(nn.Module):
         self.to_q = nn.Linear(dim, dim, bias = False)
         self.to_kv = nn.Linear(dim, dim * 2, bias = False)
 
-    def forward(self, x, context):
+    def forward(self, x, context, mask = None):
         h, scale = self.heads, self.scale
 
         q = self.to_q(x)
         kv = self.to_kv(context).chunk(2, dim = -1)
 
-        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> (b h) n d', h = h), (q, *kv))
-        dots = einsum('b i d, b j d -> b i j', q, k) * scale
-        attn = dots.softmax(dim = -1)
-        out = einsum('b i j, b j d -> b i d', attn, v)
+        q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h = h), (q, *kv))
+        dots = einsum('b h i d, b h j d -> b h i j', q, k) * scale
 
-        out = rearrange(out, '(b h) n d -> b n (h d)', h = h)
+        if exists(mask):
+            mask = rearrange(mask, 'b n -> b () () n')
+            dots.masked_fill_(~mask, float('-inf'))
+
+        attn = dots.softmax(dim = -1)
+        out = einsum('b h i j, b h j d -> b h i d', attn, v)
+
+        out = rearrange(out, 'b h n d -> b n (h d)', h = h)
         return out
 
 class ISAB(nn.Module):
@@ -45,12 +50,12 @@ class ISAB(nn.Module):
         self.attn1 = Attention(dim, heads)
         self.attn2 = Attention(dim, heads)
 
-    def forward(self, x, queries = None):
+    def forward(self, x, queries = None, mask = None):
         b, *_ = x.shape
         assert exists(queries) ^ exists(self.induced_points), 'you can only either learn the induced points within the module, or pass it in externally'
         queries = queries if exists(queries) else self.induced_points
         queries = repeat(queries, 'n d -> b n d', b = b)
 
-        induced = self.attn1(queries, x)
+        induced = self.attn1(queries, x, mask = mask)
         out     = self.attn2(x, induced)
         return out, induced

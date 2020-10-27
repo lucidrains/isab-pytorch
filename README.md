@@ -25,7 +25,9 @@ attn = ISAB(
 )
 
 x = torch.randn(1, 1024, 512)
-out, induced_points = attn(x) # (1, 1024, 512), (1, 128, 512)
+m = torch.ones((1, 1024)).bool()
+
+out, induced_points = attn(x, mask = m) # (1, 1024, 512), (1, 128, 512)
 ```
 
 Or you can not set the number of induced points, where you can pass in the induced points yourself (some global memory that propagates down the transformer, as an example)
