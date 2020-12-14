@@ -30,8 +30,9 @@ class Attention(nn.Module):
         dots = einsum('b h i d, b h j d -> b h i j', q, k) * scale
 
         if exists(mask):
+            mask_value = -torch.finfo(dots.dtype).max
             mask = rearrange(mask, 'b n -> b () () n')
-            dots.masked_fill_(~mask, float('-inf'))
+            dots.masked_fill_(~mask, mask_value)
 
         attn = dots.softmax(dim = -1)
         out = einsum('b h i j, b h j d -> b h i d', attn, v)
