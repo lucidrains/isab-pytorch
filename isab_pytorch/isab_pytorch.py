@@ -67,7 +67,8 @@ class ISAB(nn.Module):
 
     def forward(self, x, latents = None, mask = None):
         b, *_ = x.shape
-        assert exists(latents) ^ exists(self.latents), 'you can only either learn the induced points within the module, or pass it in externally'
+
+        assert exists(latents) ^ exists(self.latents), 'you can only either learn the latents within the module, or pass it in externally'
         latents = latents if exists(latents) else self.latents
 
         if latents.ndim == 2:

@@ -34,6 +34,8 @@ out, latents = attn(seq, mask = mask) # (1, 16384, 512), (1, 128, 512)
 
 Or you can not set the number of induced points, where you can pass in the induced points yourself (some global memory that propagates down the transformer, as an example)
 
+In recent literature, say Perceiver from Deepmind, it is simply named latents. We will simply call them latents, as "induced points" is a mouthful.
+
 ```python
 import torch
 from isab_pytorch import ISAB
