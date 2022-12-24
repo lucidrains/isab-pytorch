@@ -2,7 +2,7 @@
 
 ## Induced Set Attention Block (ISAB) - Pytorch
 
-A concise implementation of (Induced) Set Attention Block, from the Set Transformers paper. It proposes to reduce attention from O(n²) to O(mn), where m is the number of inducing points (learned queries).
+A concise implementation of (Induced) Set Attention Block, from the Set Transformers paper. It proposes to reduce attention from O(n²) to O(mn), where m is the number of inducing points (learned latents).
 
 Update: Interesting enough, <a href="https://arxiv.org/abs/2212.11972">a new paper</a> has used the ISAB block successfully, in the domain of denoising diffusion for efficient generation of images and video.
 
@@ -14,7 +14,7 @@ $ pip install isab-pytorch
 
 ## Usage
 
-You can either set the number of induced points, in which the parameters will be instantiated and returned on completion of cross attention.
+You can either set the number of latents, in which the parameters will be instantiated and returned on completion of cross attention.
 
 ```python
 import torch
@@ -32,9 +32,7 @@ mask = torch.ones((1, 16384)).bool()
 out, latents = attn(seq, mask = mask) # (1, 16384, 512), (1, 128, 512)
 ```
 
-Or you can not set the number of induced points, where you can pass in the induced points yourself (some global memory that propagates down the transformer, as an example)
-
-In recent literature, say Perceiver from Deepmind, it is simply named latents. We will simply call them latents, as "induced points" is a mouthful.
+Or you can choose not to set the number of latents, and pass in the latents yourself (some persistent latent that propagates down the transformer, as an example)
 
 ```python
 import torch
