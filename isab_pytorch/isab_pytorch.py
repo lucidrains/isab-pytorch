@@ -19,7 +19,6 @@ class Attention(nn.Module):
         dim_head = 64
     ):
         super().__init__()
-        assert (dim % heads) == 0, 'dimension must be divisible by number of heads'
         inner_dim = heads * dim_head
         self.heads = heads
         self.scale = dim_head ** -0.5
