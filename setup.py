@@ -3,9 +3,10 @@ from setuptools import setup, find_packages
 setup(
   name = 'isab-pytorch',
   packages = find_packages(),
-  version = '0.1.1',
+  version = '0.2.0',
   license='MIT',
   description = 'Induced Set Attention Block - Pytorch',
+  long_description_content_type = 'text/markdown',
   author = 'Phil Wang',
   author_email = 'lucidrains@gmail.com',
   url = 'https://github.com/lucidrains/isab-pytorch',

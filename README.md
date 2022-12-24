@@ -4,6 +4,8 @@
 
 A concise implementation of (Induced) Set Attention Block, from the Set Transformers paper. It proposes to reduce attention from O(n²) to O(mn), where m is the number of inducing points (learned queries).
 
+Update: Interesting enough, <a href="https://arxiv.org/abs/2212.11972">a new paper</a> has used the ISAB block successfully, in the domain of denoising diffusion for efficient generation of images and video.
+
 ## Install
 
 ```bash
@@ -21,20 +23,19 @@ from isab_pytorch import ISAB
 attn = ISAB(
     dim = 512,
     heads = 8,
-    num_induced_points = 128
+    num_latents = 128
 )
 
-x = torch.randn(1, 1024, 512)
-m = torch.ones((1, 1024)).bool()
+seq = torch.randn(1, 16384, 512) # (batch, seq, dim)
+mask = torch.ones((1, 16384)).bool()
 
-out, induced_points = attn(x, mask = m) # (1, 1024, 512), (1, 128, 512)
+out, latents = attn(seq, mask = mask) # (1, 16384, 512), (1, 128, 512)
 ```
 
 Or you can not set the number of induced points, where you can pass in the induced points yourself (some global memory that propagates down the transformer, as an example)
 
 ```python
 import torch
-from torch import nn
 from isab_pytorch import ISAB
 
 attn = ISAB(
@@ -42,21 +43,21 @@ attn = ISAB(
     heads = 8
 )
 
-mem = nn.Parameter(torch.randn(128, 512)) # some memory, passed through multiple ISABs
-x = torch.randn(1, 1024, 512)
+seq = torch.randn(1, 16384, 512) # (batch, seq, dim)
+latents = torch.nn.Parameter(torch.randn(128, 512)) # some memory, passed through multiple ISABs
 
-out, mem_updated = attn(x, mem) # (1, 1024, 512), (1, 128, 512)
+out, new_latents = attn(seq, latents) # (1, 16384, 512), (1, 128, 512)
 ```
 
 ## Citations
 
 ```bibtex
 @misc{lee2019set,
-    title={Set Transformer: A Framework for Attention-based Permutation-Invariant Neural Networks}, 
-    author={Juho Lee and Yoonho Lee and Jungtaek Kim and Adam R. Kosiorek and Seungjin Choi and Yee Whye Teh},
-    year={2019},
-    eprint={1810.00825},
-    archivePrefix={arXiv},
-    primaryClass={cs.LG}
+    title   = {Set Transformer: A Framework for Attention-based Permutation-Invariant Neural Networks},
+    author  = {Juho Lee and Yoonho Lee and Jungtaek Kim and Adam R. Kosiorek and Seungjin Choi and Yee Whye Teh},
+    year    = {2019},
+    eprint  = {1810.00825},
+    archivePrefix = {arXiv},
+    primaryClass = {cs.LG}
 }
 ```
