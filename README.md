@@ -23,7 +23,8 @@ from isab_pytorch import ISAB
 attn = ISAB(
     dim = 512,
     heads = 8,
-    num_latents = 128
+    num_latents = 128,
+    latent_self_attend = True
 )
 
 seq = torch.randn(1, 16384, 512) # (batch, seq, dim)
@@ -59,5 +60,13 @@ out, new_latents = attn(seq, latents) # (1, 16384, 512), (1, 128, 512)
     eprint  = {1810.00825},
     archivePrefix = {arXiv},
     primaryClass = {cs.LG}
+}
+```
+
+```bibtex
+@article{Alayrac2022Flamingo,
+    title   = {Flamingo: a Visual Language Model for Few-Shot Learning},
+    author  = {Jean-Baptiste Alayrac et al},
+    year    = {2022}
 }
 ```

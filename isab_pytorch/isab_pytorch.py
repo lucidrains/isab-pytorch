@@ -16,12 +16,15 @@ class Attention(nn.Module):
         self,
         dim,
         heads = 8,
-        dim_head = 64
+        dim_head = 64,
+        and_self_attend = False
     ):
         super().__init__()
         inner_dim = heads * dim_head
         self.heads = heads
         self.scale = dim_head ** -0.5
+
+        self.and_self_attend = and_self_attend
 
         self.to_q = nn.Linear(dim, inner_dim, bias = False)
         self.to_kv = nn.Linear(dim, inner_dim * 2, bias = False)
@@ -34,6 +37,12 @@ class Attention(nn.Module):
         mask = None
     ):
         h, scale = self.heads, self.scale
+
+        if self.and_self_attend:
+            context = torch.cat((x, context), dim = -2)
+
+            if exists(mask):
+                mask = F.pad(mask, (x.shape[-2], 0), value = True)
 
         q, k, v = (self.to_q(x), *self.to_kv(context).chunk(2, dim = -1))
 
@@ -57,11 +66,12 @@ class ISAB(nn.Module):
         *,
         dim,
         heads = 8,
-        num_latents = None
+        num_latents = None,
+        latent_self_attend = False
     ):
         super().__init__()
         self.latents = nn.Parameter(torch.randn(num_latents, dim)) if exists(num_latents) else None
-        self.attn1 = Attention(dim, heads)
+        self.attn1 = Attention(dim, heads, and_self_attend = latent_self_attend)
         self.attn2 = Attention(dim, heads)
 
     def forward(self, x, latents = None, mask = None):
