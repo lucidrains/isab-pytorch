@@ -50,6 +50,25 @@ latents = torch.nn.Parameter(torch.randn(128, 512)) # some memory, passed throug
 out, new_latents = attn(seq, latents) # (1, 16384, 512), (1, 128, 512)
 ```
 
+Inverted attention can be enabled with `inverted_attention = True`. In this mode, softmax is applied over the query dimension instead of the key dimension, allowing latents to compete for input tokens — as in the slot attention literature.
+
+```python
+import torch
+from isab_pytorch import ISAB
+
+attn = ISAB(
+    dim = 512,
+    heads = 8,
+    num_latents = 128,
+    inverted_attention = True
+)
+
+seq = torch.randn(1, 16384, 512)
+mask = torch.ones((1, 16384)).bool()
+
+out, latents = attn(seq, mask = mask) # (1, 16384, 512), (1, 128, 512)
+```
+
 ## Citations
 
 ```bibtex
@@ -68,5 +87,23 @@ out, new_latents = attn(seq, latents) # (1, 16384, 512), (1, 128, 512)
     title   = {Flamingo: a Visual Language Model for Few-Shot Learning},
     author  = {Jean-Baptiste Alayrac et al},
     year    = {2022}
+}
+```
+
+```bibtex
+@inproceedings{Locatello2020SlotAttention,
+    title     = {Object-Centric Learning with Slot Attention},
+    author    = {Francesco Locatello and Dirk Weissenborn and Thomas Unterthiner and Aravindh Mahendran and Georg Heigold and Jakob Uszkoreit and Alexey Dosovitskiy and Thomas Kipf},
+    booktitle = {NeurIPS},
+    year      = {2020}
+}
+```
+
+```bibtex
+@inproceedings{Luo2025InvertedAttention,
+    title     = {Inverted Attention},
+    author    = {Hanzhe Liang and Xinle Lyu and Jingze Shi and Hao Zhou and Changjian Li and Bo Dai and Jianbing Shen and Shuicheng Yan and Jiashi Feng and Zhenguo Li and Dit-Yan Yeung and Kwan-Yee K. Wong and Wanli Ouyang and Haian Luo},
+    booktitle = {ICLR},
+    year      = {2025}
 }
 ```
